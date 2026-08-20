@@ -62,6 +62,26 @@ select{width:100%;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:7
 
 .stage{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start}
 @media(max-width:1080px){.stage{grid-template-columns:1fr}}
+.stage{position:relative}
+.ctxpanel{position:absolute;top:0;right:0;width:min(372px,100%);z-index:20;background:var(--paper-2);border:1.5px solid var(--ink);box-shadow:var(--shadow);padding:13px 14px 14px;max-height:624px;overflow:auto;display:none}
+.ctxpanel.open{display:block}
+.ctxhead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ctxhead .t{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);flex:1}
+.ctxhead .x{border:1.2px solid var(--ink);background:var(--paper);cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:10px;padding:2px 7px;line-height:1.3}
+.ctxsub{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--muted);line-height:1.5;margin-bottom:9px}
+.ctxg{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--signal);font-weight:600;margin:12px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--rule-2)}
+.ctxr{display:flex;gap:8px;align-items:flex-start;padding:5px 2px;border-bottom:1px dotted var(--rule-2);cursor:pointer}
+.ctxr:hover{background:var(--paper)}
+.ctxr .box{width:12px;height:12px;border:1.3px solid var(--ink);flex:0 0 auto;margin-top:3px;background:var(--paper)}
+.ctxr.on .box{background:var(--ink)}
+.ctxr.off .box{border-style:dashed}
+.ctxr .tx{flex:1;min-width:0;display:block}
+.ctxr .nm{display:block;font-size:11.5px;font-weight:500;line-height:1.3}
+.ctxr.off .nm{color:var(--muted)}
+.ctxr .tg{display:block;font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctxr .tr{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;color:var(--ink-2);word-break:break-word;margin-top:1px}
+.ctxr .dead{display:block;font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.ctxnote{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--muted);line-height:1.5;margin-top:11px;padding-top:8px;border-top:1px solid var(--rule-2)}
 .rail{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .rail .lbl{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:4px}
 .chipS{font-family:"IBM Plex Mono",monospace;font-size:10px;border:1.2px solid var(--rule);background:var(--paper);padding:3px 8px;cursor:pointer;color:var(--ink-2)}
@@ -197,7 +217,7 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
         <button class="btn ghost tiny" data-ev="buy">Exit to a store</button>
         <button class="btn ghost tiny" data-ev="task">Attempt a task</button>
         <button class="btn ghost tiny" data-ev="grant">Grant permission</button>
-        <button class="btn ghost tiny" data-ev="ctx">Growth contextual</button>
+        <button class="btn ghost tiny" id="ctxopen">Pick contextual</button>
         <button class="btn ghost tiny" data-ev="xtap">Dismiss with X</button>
         <button class="btn ghost tiny" data-ev="withdraw">Withdraw balance</button>
       </div>
@@ -215,6 +235,7 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
     <div class="stage">
       <div class="phone" id="phone"></div>
       <div class="cap" id="cap"></div>
+      <div class="ctxpanel" id="ctxpanel"></div>
     </div>
   </div>
 </div>
@@ -233,11 +254,39 @@ const RENDER = {
   "Withdraw-your-balance nudge":{type:"modal",tag:"Popup",t:"Your balance is waiting",b:"Confirmed cashback is sitting in your account.",cta:["Later","Withdraw"]},
   "Comeback offer (rates improved since you left)":{type:"take",tag:"Full screen",t:"Welcome back",b:"Cashback rates went up while you were away.",cta:["Close","Start shopping"]},
   "Buy-push: rates increased since you left":{type:"inline",tag:"Inline card",t:"Rates increased since you left",b:"See what your favourite stores pay now.",cta:["Start shopping"]},
-  "Growth-scheduled contextual (transactional)":{type:"modal",tag:"Popup · growth",t:"Campaign offer",b:"Growth-scheduled transactional contextual for this user today.",cta:["Close","Shop now"]},
+  "Onboarding coach-mark walkthrough":{type:"spot",tag:"Coach-mark 1 of 4",t:"Start with search",b:"Step 1 of 4: search, then categories, offers for you, tutorials.",cta:["Skip","Next"]},
+  "Post-tutorial earnings sheet":{type:"take",tag:"Full screen",t:"Your tutorial cashback is in",b:"See where it landed, then withdraw it from My Earnings.",cta:["Close","View earnings"]},
+  "Tutorial cashback confirmed celebration":{type:"take",tag:"Full screen",t:"Cashback confirmed",b:"Your first cashback is confirmed and ready to withdraw.",cta:["Close","Withdraw"]},
+  "Favourites added card":{type:"inline",tag:"Inline card",t:"We added stores to your favourites",b:"Your favourites row is ready further down the homepage.",cta:["See favourites"]},
+  "First transaction tracked sheet":{type:"sheet",tag:"Bottom sheet",t:"Transaction tracked",b:"Your first order tracked. Open the reward to see what you earned.",cta:["Later","Open reward"]},
+  "New feature coach-mark":{type:"spot",tag:"Coach-mark",t:"New feature is live",b:"Try it from here. Shows at most twice more if ignored.",cta:["Dismiss","Try it"]},
+  "Gamification Hub nav tooltip":{type:"spot",tag:"Nav tooltip",t:"Missions is live in the nav",b:"Dot shows for the first 3 sessions, tooltip on the first.",cta:["Got it","Open"]},
   "Cashback tracked popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback tracked",b:"We are tracking your order. Cashback confirms after the return window.",cta:["Close","View order"]},
   "Cashback confirm popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback confirmed",b:"Your cashback is confirmed and ready to withdraw.",cta:["Close","View earnings"]},
   "Did you shop popup":{type:"sheet",tag:"Bottom sheet",t:"Did you shop?",b:"We could not track an order from your last store visit.",cta:["No","Yes, I shopped"]}
 };
+
+// The 14 homepage-scoped contextual nudges from the master map. All of them sit at P1 with no
+// order between them, which is open Ruling #6. seg is the segment the map assigns; cadence and
+// trigger are the map's own. gap is the cadence in days, null for one-time and per-session.
+const CONTEXTUAL = [
+  {id:"n01",seg:"New User",  key:"Onboarding coach-mark walkthrough",       cad:"ONE_TIME",         gap:null, trig:"on_screen == homepage · is_first_ever_session == true"},
+  {id:"n02",seg:"New User",  key:"Post-tutorial earnings sheet",            cad:"ONE_TIME",         gap:null, trig:"tutorial_status == completed"},
+  {id:"n06",seg:"New User",  key:"Tutorial cashback confirmed celebration", cad:"ONE_TIME",         gap:null, trig:"is_new_session_after_tutorial == true · tutorial_cashback_status == confirmed"},
+  {id:"n09",seg:"New User",  key:"Favourites added card",                   cad:"ONE_TIME",         gap:null, trig:"favourite_stores_pushed == true · is_first_homepage_after_favourites == true"},
+  {id:"n12",seg:"New User",  key:"First transaction tracked sheet",         cad:"ONE_TIME",         gap:null, trig:"is_new_session_after_trans == true · total_transactions == 1 · never in the same session as the exit"},
+  {id:"l01",seg:"Lapsed",    key:"Comeback offer (rates improved since you left)", cad:"ONE_TIME / return cycle", gap:null, trig:"is_first_session_after_lapse == true · days_since_last_transaction >= 60"},
+  {id:"l02",seg:"Lapsed",    key:"Withdraw-your-balance nudge",             cad:"ONCE_PER_MONTH",   gap:30,   trig:"confirmed_balance > 0 · days_since_last_withdrawal >= 30"},
+  {id:"l03",seg:"Lapsed",    key:"Buy-push: rates increased since you left",cad:"ONCE_PER_WEEK",    gap:7,    trig:"homepage_visits_this_session >= 2 · store_visits_this_session == 0"},
+  {id:"f01",seg:"Frequent",  key:"Flash deal banner",                       cad:"ONCE_PER_SESSION", gap:0   , trig:"flash_deal_active == true", amb:true},
+  {id:"f02",seg:"Frequent",  key:"Favourites glow",                         cad:"ONCE_PER_SESSION", gap:0   , trig:"has_favourite_stores == true", amb:true},
+  {id:"f03",seg:"Frequent",  key:"Trending NEW badge",                      cad:"ONCE_PER_MONTH",   gap:30,   trig:"trending_section_has_new_store == true · days_since_last_trending_nudge >= 30", amb:true},
+  {id:"f04",seg:"Frequent",  key:"Top card pick",                           cad:"ONCE_PER_MONTH",   gap:30,   trig:"is_first_session_of_month == true · monthly_card_suggestion_shown == false", amb:true},
+  {id:"f05",seg:"Frequent",  key:"New feature coach-mark",                  cad:"ONE_TIME / feature",gap:null,trig:"new_feature_launched == true · user_has_used_feature == false"},
+  {id:"f06",seg:"Frequent",  key:"Gamification Hub nav tooltip",            cad:"ONE_TIME",         gap:null, trig:"gamification_hub_launched == true · user_has_opened_gamification_hub == false"}
+];
+const SEGNAME={new:"New User",never:"New User",lapsed:"Lapsed",nonfreq:"Frequent",freq:"Frequent"};
+const CTX=id=>CONTEXTUAL.find(c=>c.id===id);
 
 let S, day, sessionNo, openDays, lastOpenDay, armed, frames, viewing;
 
@@ -249,9 +298,9 @@ function init(){
      primerLastNo:null,primaryShown:g("prim"),tabOpened:false,taskDone:false,
      smsBurned:0,smsLastDay:null,lapsedComeback:false,lapsedWeek:null,
      withdrawSeen:null,lastWithdrawal:null,pendingExit:null,
-     txns:0,exitKind:gv("exit"),forksSeen:{}};
+     txns:0,exitKind:gv("exit"),forksSeen:{},ctxPick:[],ctxSeen:{}};
   day=0;sessionNo=0;openDays=0;lastOpenDay=null;armed={};frames=[];viewing=null;
-  renderState();renderClocks();renderArmed();renderRail();
+  renderState();renderClocks();renderArmed();renderRail();renderCtxPanel();closeCtx();
   drawPhone(null,[]);
   const cap=document.getElementById("cap");
   cap.className="cap";
@@ -268,23 +317,38 @@ function runSession(){
   const fork=(k,t)=>{if(!S.forksSeen[k]){S.forksSeen[k]=true;forks.push(t);}};
 
   if(sessionNo===1)fork("session","\"Session\" is a homepage visit in the logic doc and an app open in every per-session rule. This walk counts one session per app open. The one-per-session cap on post exit only binds under the app-open reading.");
-  if(S.seg==="new"&&sessionNo===1)fork("d0","Day 0 also wants the onboarding coach-mark walkthrough. Ruling #1 is open, so this walk shows the primer taking session 1.");
 
-  const ctxList=[];
-  if(armed.ctx)ctxList.push("Growth-scheduled contextual (transactional)");
-  if(S.seg==="lapsed"){
-    const wdOk=(S.lastWithdrawal===null||day-S.lastWithdrawal>=30);
-    if(S.balance&&wdOk&&(S.withdrawSeen===null||day-S.withdrawSeen>=30))ctxList.push("Withdraw-your-balance nudge");
-    if(!S.lapsedComeback&&sessionNo===1)ctxList.push("Comeback offer (rates improved since you left)");
-    if(sessionNo>1&&(S.lapsedWeek===null||day-S.lapsedWeek>=7))ctxList.push("Buy-push: rates increased since you left");
-  }
+  // P1. A contextual is eligible either because its own conditions hold for this segment, or
+  // because growth scheduled it in the picker. Cadence applies either way.
+  const autoOn=id=>{
+    if(S.seg!=="lapsed")return false;
+    if(id==="l02")return S.balance&&(S.lastWithdrawal===null||day-S.lastWithdrawal>=30);
+    if(id==="l01")return !S.lapsedComeback&&sessionNo===1;
+    if(id==="l03")return sessionNo>1;
+    return false;
+  };
+  const cadenceOk=c=>{
+    const seen=S.ctxSeen[c.id];
+    if(seen===undefined)return true;
+    if(c.gap===null)return false;
+    return day-seen>=c.gap;
+  };
+  const ctxList=[],ctxAmb=[];
+  CONTEXTUAL.forEach(c=>{
+    if(!(S.ctxPick.includes(c.id)||autoOn(c.id)))return;
+    if(!cadenceOk(c))return;
+    if(c.amb)ctxAmb.push(c.id); else ctxList.push(c.key);
+  });
 
   if(ctxList.length){
     fired=ctxList[0];
     why="A contextual nudge is eligible, and contextual sits at the top of the order.";
     if(ctxList.length>1)tie="Also eligible this session: "+ctxList.slice(1).join(" · ")+". The tie-break between contextual nudges is not decided (Ruling #6). P1 holds 23 nudges in total and none of them are ordered against each other.";
-    if(armed.ctx)armed.ctx=false;
+    const won=CONTEXTUAL.find(c=>c.key===fired);
+    if(won){S.ctxSeen[won.id]=day;flips.push(`${won.id} shown · cadence ${won.cad}`);}
     if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return cycle");}
+    if(fired.startsWith("First transaction tracked"))fork("mysterybox","Master map Note C: the sheet describes a Mystery Box scratch card, the Figma shows a transaction-tracked celebration. Spec versus design, unresolved at source.");
+    if(fired.startsWith("Gamification Hub nav"))tie=(tie?tie+" ":"")+"Ruling #2: this is the same Introducing Missions launch as the P3 primary nudge, delivered as a nav dot instead of a takeover. One screen, two mechanisms, two owners.";
     if(fired.startsWith("Withdraw")){S.withdrawSeen=day;flips.push("withdraw nudge on a 30-day cadence");
       fork("withdraw","The master map gates this on 30 days since the last withdrawal. The workbook gates it on 30 days since the nudge last fired. Different rule: only one of them stops when the user actually withdraws.");}
     if(fired.startsWith("Buy-push")){S.lapsedWeek=day;flips.push("buy-push on a 7-day gap");
@@ -360,9 +424,12 @@ function runSession(){
     armed.task=false;
   }
 
+  if(S.seg==="new"&&sessionNo===1)fork("d0",`Day 0 collision: the onboarding coach-mark walkthrough and the push primer both want session 1. Ruling #1 is open. This walk gave it to ${fired?fired.toLowerCase():"nothing, because neither was eligible"}.`);
+
   const amb=[];
   if(S.tg&&S.primaryShown&&!S.taskDone)amb.push("Mission logo pulse");
-  if(S.seg==="freq"){amb.push("Flash deal banner");amb.push("Favourites glow");amb.push("Trending NEW badge");amb.push("Top card pick");}
+  if(S.seg==="freq")CONTEXTUAL.filter(c=>c.amb).forEach(c=>amb.push(c.key));
+  ctxAmb.forEach(id=>{const c=CTX(id);if(!amb.includes(c.key)){amb.push(c.key);}S.ctxSeen[id]=day;});
   if(!S.tg)amb.push("No gamification at all (CG)");
 
   frames.push({n:sessionNo,day,fired,why,tie,amb,flips,forks,event});
@@ -455,12 +522,62 @@ function renderClocks(){
 }
 function eventLabel(){
   const l=[];if(armed.buy)l.push("exit to a store");if(armed.task)l.push("task attempt");
-  if(armed.grant)l.push("permission granted");if(armed.ctx)l.push("contextual scheduled");
+  if(armed.grant)l.push("permission granted");if(S.ctxPick.length)l.push(`${S.ctxPick.length} contextual scheduled`);
   if(armed.xtap)l.push("X-tap dismiss");if(armed.withdraw)l.push("withdrawal");
   return l.length?l.join(" · "):null;
 }
-function renderArmed(){document.querySelectorAll("[data-ev]").forEach(b=>b.classList.toggle("armed",!!armed[b.dataset.ev]));}
+function renderArmed(){
+  document.querySelectorAll("[data-ev]").forEach(b=>b.classList.toggle("armed",!!armed[b.dataset.ev]));
+  const b=document.getElementById("ctxopen");
+  b.classList.toggle("armed",S.ctxPick.length>0);
+  b.textContent=S.ctxPick.length?`Contextual · ${S.ctxPick.length} on`:"Pick contextual";
+}
 function clearArmed(){armed={};renderArmed();}
+
+function renderCtxPanel(){
+  const here=SEGNAME[S.seg];
+  let html=`<div class="ctxhead"><span class="t">Pick a contextual</span><button class="x" id="ctxclose">Done</button></div>
+    <div class="ctxsub">All of these sit at P1 with no order between them. Arm more than one to see the collision. Segment now: ${here}.</div>`;
+  ["New User","Lapsed","Frequent"].forEach(g=>{
+    const rows=CONTEXTUAL.filter(c=>c.seg===g);
+    if(!rows.length)return;
+    html+=`<div class="ctxg">${g}${g===here?"":" · off-segment"}</div>`;
+    rows.forEach(c=>{
+      const on=S.ctxPick.includes(c.id);
+      const used=S.ctxSeen[c.id]!==undefined&&c.gap===null;
+      html+=`<div class="ctxr ${on?"on":""} ${c.seg===here?"":"off"}" data-id="${c.id}">
+        <span class="box"></span>
+        <span class="tx">
+          <span class="nm">${c.key}</span>
+          <span class="tg">${c.id} · ${c.cad}${c.amb?" · ambient, no session slot":""}</span>
+          ${used?'<span class="dead">shown once, done for life</span>':""}
+          <span class="tr">${c.trig}</span>
+        </span></div>`;
+    });
+  });
+  html+=`<div class="ctxnote">14 of the master map's 23 nudges. The other 9 fire on their own screens (My Earnings, order detail, store page, search, refer) so they never contend for the homepage session slot. Off-segment rows stay selectable on purpose.</div>`;
+  document.getElementById("ctxpanel").innerHTML=html;
+  document.getElementById("ctxclose").addEventListener("click",closeCtx);
+  document.querySelectorAll("#ctxpanel .ctxr").forEach(r=>r.addEventListener("click",()=>{
+    const id=r.dataset.id, i=S.ctxPick.indexOf(id);
+    if(i<0)S.ctxPick.push(id); else S.ctxPick.splice(i,1);
+    renderCtxPanel();renderArmed();
+  }));
+}
+function openCtx(){renderCtxPanel();document.getElementById("ctxpanel").classList.add("open");}
+function closeCtx(){document.getElementById("ctxpanel").classList.remove("open");}
+
+document.getElementById("ctxopen").addEventListener("click",e=>{
+  e.stopPropagation();
+  const el=document.getElementById("ctxpanel");
+  el.classList.contains("open")?closeCtx():openCtx();
+});
+// The panel re-renders its own innerHTML on every pick, which detaches the click target before the
+// document handler runs. Stop the event at the panel so a pick is never read as an outside click.
+document.getElementById("ctxpanel").addEventListener("click",e=>e.stopPropagation());
+document.addEventListener("click",()=>{
+  if(document.getElementById("ctxpanel").classList.contains("open"))closeCtx();
+});
 
 document.querySelectorAll(".seg").forEach(seg=>{
   seg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
