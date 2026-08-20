@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nudge Journey — What they see</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f2eee4; --paper-2:#e9e4d6; --ink:#16150f; --ink-2:#4a4739;
+  --muted:#8a8574; --rule:#cdc6b3; --rule-2:#ded8c8;
+  --signal:#d8481f; --signal-soft:#f6dcd2; --go:#1d6b52; --go-soft:#dbe9e3;
+  --warn:#9a6b12; --warn-soft:#f5e8cc;
+  --wire:#e4e0d6; --wire-2:#d3cec1; --wire-3:#bdb7a8;
+  --shadow:6px 6px 0 rgba(22,21,15,.09);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  background-image:linear-gradient(to right,rgba(22,21,15,.035) 1px,transparent 1px),
+                   linear-gradient(to bottom,rgba(22,21,15,.035) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink);font-family:"IBM Plex Sans",sans-serif;font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 26px 70px}
+header{border-bottom:2px solid var(--ink);padding-bottom:15px;margin-bottom:24px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);font-weight:600}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(28px,4.6vw,48px);line-height:.95;letter-spacing:-.03em;margin:8px 0 9px}
+h1 em{font-style:normal;color:var(--signal)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2)}
+.meta b{color:var(--ink);font-weight:600}
+
+.cols{display:grid;grid-template-columns:312px 1fr;gap:24px;align-items:start}
+@media(max-width:920px){.cols{grid-template-columns:1fr}}
+
+.panel{background:var(--paper-2);border:1.5px solid var(--ink);box-shadow:var(--shadow);padding:14px 15px 16px;margin-bottom:15px}
+.panel-title{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-bottom:11px}
+.ctrl{margin-bottom:10px}
+.ctrl label{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-2);margin-bottom:4px}
+.seg{display:flex;border:1.2px solid var(--ink);background:var(--paper)}
+.seg button{flex:1;border:0;background:transparent;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;padding:6px 3px;color:var(--ink-2)}
+.seg button+button{border-left:1.2px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+select{width:100%;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:7px 8px;border:1.2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0}
+.btn{width:100%;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;padding:11px;margin-bottom:8px}
+.btn:hover{background:var(--signal);border-color:var(--signal)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.ghost:hover{background:var(--paper-2);color:var(--ink);border-color:var(--ink)}
+.btn.tiny{font-size:9.5px;padding:8px 4px;letter-spacing:.05em;margin-bottom:0}
+.btn.armed{background:var(--warn);border-color:var(--warn);color:#fff}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.st{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dotted var(--rule-2);font-family:"IBM Plex Mono",monospace;font-size:10.5px}
+.st:last-child{border-bottom:0}
+.st .k{color:var(--muted)} .st .v{font-weight:600;text-align:right}
+.st .v.on{color:var(--go)} .st .v.off{color:var(--signal)}
+.st.changed{background:var(--warn-soft);margin:0 -5px;padding:5px 5px}
+
+.stage{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start}
+@media(max-width:1080px){.stage{grid-template-columns:1fr}}
+.rail{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.rail .lbl{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chipS{font-family:"IBM Plex Mono",monospace;font-size:10px;border:1.2px solid var(--rule);background:var(--paper);padding:3px 8px;cursor:pointer;color:var(--ink-2)}
+.chipS:hover{border-color:var(--ink)}
+.chipS.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chipS.blank{color:var(--muted);border-style:dashed}
+
+.phone{width:306px;height:624px;border:2px solid var(--ink);background:#faf8f3;position:relative;overflow:hidden;box-shadow:var(--shadow);flex:0 0 auto}
+.notch{height:22px;background:var(--wire);border-bottom:1px solid var(--wire-2);display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.notch i{display:block;height:5px;background:var(--wire-3);border-radius:2px}
+.appbar{height:40px;border-bottom:1px solid var(--wire-2);display:flex;align-items:center;gap:8px;padding:0 12px;background:#fff}
+.logo{width:60px;height:13px;background:var(--wire-3)}
+.appbar .sp{flex:1}
+.icn{width:16px;height:16px;border:1.4px solid var(--wire-3)}
+.screen{position:absolute;top:62px;bottom:52px;left:0;right:0;overflow:hidden;padding:11px}
+.searchbar{height:32px;border:1.4px solid var(--wire-2);background:#fff;display:flex;align-items:center;padding:0 10px;gap:7px}
+.searchbar i{width:11px;height:11px;border:1.4px solid var(--wire-3);border-radius:50%}
+.searchbar span{height:7px;width:110px;background:var(--wire)}
+.cats{display:flex;gap:9px;margin-top:13px}
+.cat{flex:1;text-align:center}
+.cat b{display:block;height:34px;border-radius:50%;background:var(--wire);border:1px solid var(--wire-2)}
+.cat i{display:block;height:5px;background:var(--wire);margin:5px 4px 0}
+.sechead{display:flex;align-items:center;gap:7px;margin:15px 0 8px}
+.sechead b{height:8px;width:96px;background:var(--wire-3);display:block}
+.sechead i{height:6px;width:34px;background:var(--wire);display:block;margin-left:auto}
+.banner{height:56px;background:var(--wire);border:1px solid var(--wire-2)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}
+.grid.glow{padding:4px;margin-left:-4px;margin-right:-4px}
+.tile{height:52px;background:#fff;border:1px solid var(--wire-2);position:relative}
+.tile i{position:absolute;left:8px;right:8px;top:12px;height:14px;background:var(--wire)}
+.tile b{position:absolute;left:8px;bottom:9px;height:5px;width:26px;background:var(--wire-3);display:block}
+.nav{position:absolute;bottom:0;left:0;right:0;height:52px;background:#fff;border-top:1px solid var(--wire-2);display:flex;z-index:7}
+.nav div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative}
+.nav div b{width:17px;height:17px;border:1.5px solid var(--wire-3);display:block}
+.nav div i{width:20px;height:4px;background:var(--wire);display:block}
+.nav div.mission b{border-color:var(--ink);border-radius:50%}
+.nav div.mission.pulsing b{animation:pl 1.5s ease-in-out infinite}
+.nav div.mission.pulsing:after{content:"";position:absolute;top:9px;right:21px;width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pl 1.5s ease-in-out infinite}
+@keyframes pl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+.glow{box-shadow:0 0 0 2px var(--go);animation:gl 1.8s ease-in-out infinite}
+@keyframes gl{0%,100%{box-shadow:0 0 0 2px var(--go)}50%{box-shadow:0 0 0 5px rgba(29,107,82,.18)}}
+
+.dim{position:absolute;inset:0;background:rgba(22,21,15,.42);z-index:5}
+.ov{position:absolute;z-index:6;background:#fff;border:1.6px solid var(--ink);box-shadow:5px 5px 0 rgba(22,21,15,.22)}
+.ov .t{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:15px;letter-spacing:-.01em;margin-bottom:5px;line-height:1.25}
+.ov .b{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-2);line-height:1.55}
+.ov .cta{display:flex;gap:7px;margin-top:13px}
+.ov .cta span{flex:1;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;padding:7px 4px;border:1.3px solid var(--ink)}
+.ov .cta span.p{background:var(--ink);color:#fff}
+.ov .tag{font-family:"IBM Plex Mono",monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--signal);font-weight:600;margin-bottom:6px}
+.ov.modal{top:180px;left:22px;right:22px;padding:16px}
+.ov.sheet{bottom:52px;left:0;right:0;padding:18px 16px 20px;border-bottom:0;border-left:0;border-right:0}
+.ov.sheet:before{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);width:36px;height:3px;background:var(--wire-2)}
+.ov.take{inset:0;bottom:52px;border:0;box-shadow:none;padding:34px 22px;display:flex;flex-direction:column;justify-content:center;background:#fff}
+.ov.take .t{font-size:22px;line-height:1.1}
+.ov.tip{top:112px;left:16px;right:16px;padding:12px 14px}
+.ov.tip:before{content:"";position:absolute;top:-7px;left:36px;width:12px;height:12px;background:#fff;border-left:1.6px solid var(--ink);border-top:1.6px solid var(--ink);transform:rotate(45deg)}
+.ov.inline{position:relative;margin-top:13px;padding:12px;box-shadow:none;border-color:var(--go);z-index:1}
+.cut{position:absolute;z-index:6;border:2px solid var(--signal);left:11px;top:73px;right:11px;height:32px;pointer-events:none;background:#fff}
+
+.cap{border:1.5px solid var(--rule);background:var(--paper);padding:13px 15px}
+.cap.fired{border-color:var(--ink);box-shadow:var(--shadow)}
+.caphead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:3px}
+.caphead .sn{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;background:var(--ink);color:var(--paper);padding:2px 7px}
+.caphead .day{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted)}
+.caphead .evt{font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--warn);border:1px solid var(--warn);padding:1px 6px}
+.cap h3{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:17px;margin:6px 0 4px;letter-spacing:-.01em;display:flex;gap:9px;align-items:center}
+.cap h3 .dot{width:8px;height:8px;background:var(--signal);flex:0 0 auto}
+.cap h3.none{color:var(--muted);font-weight:400;font-size:15px}
+.cap h3.none .dot{background:var(--rule)}
+.cap .why{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-2);line-height:1.6}
+.cap .tie{margin-top:9px;border-left:2px solid var(--warn);padding:5px 0 5px 10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--warn);line-height:1.6}
+.cap .amb{margin-top:10px;padding-top:9px;border-top:1px dotted var(--rule);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cap .amb .lbl{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:10px;background:var(--go-soft);color:var(--go);border:1px solid var(--go);padding:1px 7px}
+.chip.grey{background:transparent;color:var(--muted);border-color:var(--rule)}
+.cap .fork{margin-top:9px;border-left:2px solid var(--signal);padding:6px 0 6px 10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-2);line-height:1.6}
+.cap .fork .lbl{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal);font-weight:600;margin-bottom:3px}
+.cap .fork p{margin:0 0 5px}
+.cap .fork p:last-child{margin-bottom:0}
+.cap .flips{margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--warn)}
+.cap .flips b{color:var(--ink)}
+.clocks{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-2);margin-top:12px}
+.clocks b{color:var(--signal)}
+footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">CashKaro · Homepage · Nudge journey</div>
+  <h1>What they <em>actually see</em></h1>
+  <div class="meta">
+    <span><b>Set</b> a starting condition</span>
+    <span><b>Step</b> through sessions and days</span>
+    <span><b>Rules</b> decide what renders, not a script</span>
+    <span><b>Version</b> 20 Aug 2026 · fact-checked 21 Aug</span>
+  </div>
+</header>
+
+<div class="cols">
+  <div>
+    <div class="panel">
+      <div class="panel-title">Starting condition</div>
+      <div class="ctrl"><label>Segment</label>
+        <select id="segment">
+          <option value="new">New</option><option value="never">Never shopped</option>
+          <option value="lapsed">Lapsed</option><option value="nonfreq">Non-frequent</option>
+          <option value="freq">Frequent</option>
+        </select></div>
+      <div class="ctrl"><label>Notification permission</label>
+        <div class="seg" data-k="notif"><button data-v="0" aria-pressed="true">Not given</button><button data-v="1" aria-pressed="false">Given</button></div></div>
+      <div class="ctrl"><label>Gamification group</label>
+        <div class="seg" data-k="tg"><button data-v="1" aria-pressed="true">TG</button><button data-v="0" aria-pressed="false">CG</button></div></div>
+      <div class="ctrl"><label>Gamification intro</label>
+        <div class="seg" data-k="prim"><button data-v="0" aria-pressed="true">Not yet seen</button><button data-v="1" aria-pressed="false">Already seen</button></div></div>
+      <div class="ctrl"><label>SMS permission</label>
+        <div class="seg" data-k="sms"><button data-v="0" aria-pressed="true">Not given</button><button data-v="1" aria-pressed="false">Given</button></div></div>
+      <div class="ctrl"><label>What happens on that exit</label>
+        <div class="seg" data-k="exit"><button data-v="tracked" aria-pressed="true">Tracked</button><button data-v="confirmed" aria-pressed="false">Confirmed</button><button data-v="none" aria-pressed="false">Nothing</button></div></div>
+      <div class="ctrl"><label>Confirmed balance (lapsed rules)</label>
+        <div class="seg" data-k="bal"><button data-v="0" aria-pressed="true">Zero</button><button data-v="1" aria-pressed="false">Has balance</button></div></div>
+      <button class="btn ghost tiny" id="reset" style="margin-top:4px">Reset journey</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Step</div>
+      <button class="btn" id="open">Open app</button>
+      <button class="btn ghost" id="skip">Skip a day</button>
+      <div class="panel-title" style="margin:13px 0 8px">Do this in the next session</div>
+      <div class="btnrow">
+        <button class="btn ghost tiny" data-ev="buy">Exit to a store</button>
+        <button class="btn ghost tiny" data-ev="task">Attempt a task</button>
+        <button class="btn ghost tiny" data-ev="grant">Grant permission</button>
+        <button class="btn ghost tiny" data-ev="ctx">Growth contextual</button>
+        <button class="btn ghost tiny" data-ev="xtap">Dismiss with X</button>
+        <button class="btn ghost tiny" data-ev="withdraw">Withdraw balance</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Live conditions</div>
+      <div id="state"></div>
+      <div class="clocks" id="clocks"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="rail" id="rail"></div>
+    <div class="stage">
+      <div class="phone" id="phone"></div>
+      <div class="cap" id="cap"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>Homepage only · one blocking nudge per session · ambient runs alongside</span>
+  <span>Open rulings are shown, never resolved</span>
+</footer>
+</div>
+
+<script>
+const RENDER = {
+  "Push primer":{type:"modal",tag:"Popup",t:"Turn on notifications",b:"Get alerts when your cashback tracks and confirms.",cta:["Not now","Allow"]},
+  "Gamification primary nudge":{type:"take",tag:"Full screen",t:"Introducing Missions",b:"Complete simple tasks and earn bonus cashback.",cta:["Maybe later","Explore"]},
+  "SMS reading bottom sheet":{type:"sheet",tag:"Bottom sheet",t:"Allow SMS reading",b:"We read order messages so your cashback tracks faster.",cta:["Not now","Allow"]},
+  "Withdraw-your-balance nudge":{type:"modal",tag:"Popup",t:"Your balance is waiting",b:"Confirmed cashback is sitting in your account.",cta:["Later","Withdraw"]},
+  "Comeback offer (rates improved since you left)":{type:"take",tag:"Full screen",t:"Welcome back",b:"Cashback rates went up while you were away.",cta:["Close","Start shopping"]},
+  "Buy-push: rates increased since you left":{type:"inline",tag:"Inline card",t:"Rates increased since you left",b:"See what your favourite stores pay now.",cta:["Start shopping"]},
+  "Growth-scheduled contextual (transactional)":{type:"modal",tag:"Popup · growth",t:"Campaign offer",b:"Growth-scheduled transactional contextual for this user today.",cta:["Close","Shop now"]},
+  "Cashback tracked popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback tracked",b:"We are tracking your order. Cashback confirms after the return window.",cta:["Close","View order"]},
+  "Cashback confirm popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback confirmed",b:"Your cashback is confirmed and ready to withdraw.",cta:["Close","View earnings"]},
+  "Did you shop popup":{type:"sheet",tag:"Bottom sheet",t:"Did you shop?",b:"We could not track an order from your last store visit.",cta:["No","Yes, I shopped"]}
+};
+
+let S, day, sessionNo, openDays, lastOpenDay, armed, frames, viewing;
+
+function init(){
+  const seg=document.getElementById("segment").value;
+  const g=k=>document.querySelector(`.seg[data-k="${k}"] button[aria-pressed="true"]`).dataset.v==="1";
+  const gv=k=>document.querySelector(`.seg[data-k="${k}"] button[aria-pressed="true"]`).dataset.v;
+  S={seg,notif:g("notif"),tg:g("tg"),smsGranted:g("sms"),balance:g("bal"),
+     primerLastNo:null,primaryShown:g("prim"),tabOpened:false,taskDone:false,
+     smsBurned:0,smsLastDay:null,lapsedComeback:false,lapsedWeek:null,
+     withdrawSeen:null,lastWithdrawal:null,pendingExit:null,
+     txns:0,exitKind:gv("exit"),forksSeen:{}};
+  day=0;sessionNo=0;openDays=0;lastOpenDay=null;armed={};frames=[];viewing=null;
+  renderState();renderClocks();renderArmed();renderRail();
+  drawPhone(null,[]);
+  const cap=document.getElementById("cap");
+  cap.className="cap";
+  cap.innerHTML=`<div class="why">No sessions yet. Set a starting condition, then press <b>Open app</b>. The phone shows exactly what renders in that session.</div>`;
+}
+
+function runSession(){
+  sessionNo++;
+  const isNewOpenDay=(lastOpenDay!==day);
+  if(isNewOpenDay){openDays++;lastOpenDay=day;}
+  const before=snapshot(), flips=[], forks=[];
+  const event=eventLabel();
+  let fired=null,why="",tie=null,primerFiredToday=false;
+  const fork=(k,t)=>{if(!S.forksSeen[k]){S.forksSeen[k]=true;forks.push(t);}};
+
+  if(sessionNo===1)fork("session","\"Session\" is a homepage visit in the logic doc and an app open in every per-session rule. This walk counts one session per app open. The one-per-session cap on post exit only binds under the app-open reading.");
+  if(S.seg==="new"&&sessionNo===1)fork("d0","Day 0 also wants the onboarding coach-mark walkthrough. Ruling #1 is open, so this walk shows the primer taking session 1.");
+
+  const ctxList=[];
+  if(armed.ctx)ctxList.push("Growth-scheduled contextual (transactional)");
+  if(S.seg==="lapsed"){
+    const wdOk=(S.lastWithdrawal===null||day-S.lastWithdrawal>=30);
+    if(S.balance&&wdOk&&(S.withdrawSeen===null||day-S.withdrawSeen>=30))ctxList.push("Withdraw-your-balance nudge");
+    if(!S.lapsedComeback&&sessionNo===1)ctxList.push("Comeback offer (rates improved since you left)");
+    if(sessionNo>1&&(S.lapsedWeek===null||day-S.lapsedWeek>=7))ctxList.push("Buy-push: rates increased since you left");
+  }
+
+  if(ctxList.length){
+    fired=ctxList[0];
+    why="A contextual nudge is eligible, and contextual sits at the top of the order.";
+    if(ctxList.length>1)tie="Also eligible this session: "+ctxList.slice(1).join(" · ")+". The tie-break between contextual nudges is not decided (Ruling #6). P1 holds 23 nudges in total and none of them are ordered against each other.";
+    if(armed.ctx)armed.ctx=false;
+    if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return cycle");}
+    if(fired.startsWith("Withdraw")){S.withdrawSeen=day;flips.push("withdraw nudge on a 30-day cadence");
+      fork("withdraw","The master map gates this on 30 days since the last withdrawal. The workbook gates it on 30 days since the nudge last fired. Different rule: only one of them stops when the user actually withdraws.");}
+    if(fired.startsWith("Buy-push")){S.lapsedWeek=day;flips.push("buy-push on a 7-day gap");
+      fork("buypush","The master map trigger is behavioural and inside a single session: 2 or more homepage visits with no store visit. The workbook uses second session onward, weekly. This walk uses the workbook.");}
+  }
+
+  if(!fired&&!S.notif&&(S.primerLastNo===null||day-S.primerLastNo>=5)){
+    fired="Push primer";
+    why="Notifications not given, and 5 or more calendar days since the last no.";
+    primerFiredToday=true;
+    if(armed.grant){S.notif=true;armed.grant=false;flips.push("permission GIVEN · primer dead for life");}
+    else{S.primerLastNo=day;flips.push("5-day calendar timer restarts");}
+  }
+
+  if(!fired&&S.tg&&!S.primaryShown&&!S.tabOpened){
+    fired="Gamification primary nudge";
+    why="In TG, never shown before, gamification tab not opened.";
+    if(S.seg!=="new")tie="Ruling #2: this is the same full-screen Introducing Missions screen that the master map delivers as a Frequent nav-dot takeover. One screen, two delivery mechanisms, two owners. Not decided.";
+    S.primaryShown=true;flips.push("primary consumed, gone for life · mission pulse switches on");
+  }
+
+  const smsAlive=!S.smsGranted&&S.smsBurned<4;
+  const smsDay=smsAlive&&isNewOpenDay&&(S.smsLastDay===null||openDays-S.smsLastDay>=2)&&!primerFiredToday;
+  if(!fired&&smsDay){
+    fired="SMS reading bottom sheet";
+    why="Alternate app-open day, first open of the day, primer did not fire today, under 4 lifetime interactions.";
+    S.smsLastDay=openDays;
+    const granted=!!armed.grant, xtapped=!!armed.xtap;
+    if(granted){S.smsGranted=true;armed.grant=false;flips.push("SMS permission GIVEN · sheet dead for life");}
+    else if(xtapped){S.smsBurned++;armed.xtap=false;flips.push(`X-tap dismiss · SMS interaction ${S.smsBurned} of 4 burned`);
+      if(S.smsBurned>=3)fork("smscap","The logic doc reads as five displays (lifetime interactions at most 4). Both workbooks read as four. This walk uses four.");}
+    else{flips.push("ignored, not dismissed · nothing burned, the sheet returns on the next alternate app-open day");
+      fork("smsignore","Only an X-tap or a permission grant burns an interaction. A user who ignores the sheet never reaches the 4-interaction cap, so this loop has no terminating condition.");}
+  }
+
+  if(!fired&&S.pendingExit){
+    const map={tracked:["Cashback tracked popup","the transaction tracked on that exit"],
+               confirmed:["Cashback confirm popup","that cashback has now confirmed"],
+               none:["Did you shop popup","nothing tracked from that exit"]};
+    const [pop,txt]=map[S.pendingExit];
+    fired=pop;
+    why="Back on the homepage after the exit in an earlier session, and "+txt+".";
+    if(S.pendingExit==="confirmed")fork("threeplusone","The PRD addendum example still gates cashback confirm on 3+1. The logic doc says 3+1 gates nothing and confirm fires for all users. This walk follows the logic doc.");
+    if(S.pendingExit==="tracked"&&S.seg==="new"&&S.txns===1)fork("tracked","Ruling #3: the master map also fires a transaction-tracked celebration on the next app open after the first transaction. Same fact, two screens, sessions apart.");
+    S.pendingExit=null;
+  }else if(S.pendingExit){
+    why+=" The post-exit popup from the earlier exit was also eligible but lost the slot, so its counter did not move and it stays pending.";
+  }
+
+  if(armed.buy){
+    if(S.exitKind!=="none")S.txns++;
+    if(S.pendingExit)flips.push("a second exit overwrites the pending post-exit popup");
+    S.pendingExit=S.exitKind;
+    flips.push("exited to a store · the post-exit popup is checked from the next session, never this one");
+    if(S.seg==="lapsed"&&S.exitKind!=="none"){flips.push("purchase ends the lapsed rules · moves to Non-frequent");S.seg="nonfreq";}
+    armed.buy=false;
+  }
+
+  if(armed.withdraw){
+    if(S.balance){S.balance=false;S.lastWithdrawal=day;flips.push("balance withdrawn · withdraw nudge dead");}
+    armed.withdraw=false;
+  }
+
+  if(!fired){
+    if(S.seg==="never")why="Every blocking rule is in cooldown or already used up, and no contextual rule exists for this segment.";
+    else if(S.seg==="nonfreq")why="No contextual scheduled, permissions settled, nothing event-driven. No dedicated contextual content exists for this segment yet.";
+    else if(S.seg==="freq")why="Nothing blocking, by design. Frequent users get the ambient layer only.";
+    else why="No rule's conditions are met this session.";
+  }
+
+  if(armed.task){
+    if(!S.taskDone){S.taskDone=true;S.tabOpened=true;flips.push("task attempted · mission pulse stops for life");}
+    armed.task=false;
+  }
+
+  const amb=[];
+  if(S.tg&&S.primaryShown&&!S.taskDone)amb.push("Mission logo pulse");
+  if(S.seg==="freq"){amb.push("Flash deal banner");amb.push("Favourites glow");amb.push("Trending NEW badge");amb.push("Top card pick");}
+  if(!S.tg)amb.push("No gamification at all (CG)");
+
+  frames.push({n:sessionNo,day,fired,why,tie,amb,flips,forks,event});
+  viewing=frames.length-1;
+  clearArmed();showFrame(viewing);renderState(before);renderClocks();
+}
+
+function drawPhone(fired,amb){
+  const pulsing=amb.includes("Mission logo pulse");
+  const glowBanner=amb.includes("Flash deal banner");
+  const glowFav=amb.includes("Favourites glow");
+  const r=fired?RENDER[fired]:null;
+  const dim=r&&["modal","sheet","take","spot"].includes(r.type);
+  let ov="";
+  if(r&&r.type!=="inline"){
+    const cta=`<div class="cta">${r.cta.map((c,i)=>`<span class="${i===r.cta.length-1?"p":""}">${c}</span>`).join("")}</div>`;
+    if(r.type==="take") ov=`<div class="ov take"><div class="tag">${r.tag}</div><div class="t">${r.t}</div><div class="b">${r.b}</div>${cta}</div>`;
+    if(r.type==="modal")ov=`<div class="ov modal"><div class="tag">${r.tag}</div><div class="t">${r.t}</div><div class="b">${r.b}</div>${cta}</div>`;
+    if(r.type==="sheet")ov=`<div class="ov sheet"><div class="tag">${r.tag}</div><div class="t">${r.t}</div><div class="b">${r.b}</div>${cta}</div>`;
+    if(r.type==="spot") ov=`<div class="cut"></div><div class="ov tip"><div class="tag">${r.tag}</div><div class="t">${r.t}</div><div class="b">${r.b}</div>${cta}</div>`;
+  }
+  const inlineCard=(r&&r.type==="inline")
+    ? `<div class="ov inline"><div class="tag">${r.tag}</div><div class="t">${r.t}</div><div class="b">${r.b}</div><div class="cta"><span class="p">${r.cta[0]}</span></div></div>` : "";
+
+  document.getElementById("phone").innerHTML=`
+    <div class="notch"><i style="width:26px"></i><i style="width:40px"></i></div>
+    <div class="appbar"><span class="logo"></span><span class="sp"></span><span class="icn"></span><span class="icn"></span></div>
+    <div class="screen">
+      <div class="searchbar"><i></i><span></span></div>
+      <div class="cats">${'<div class="cat"><b></b><i></i></div>'.repeat(5)}</div>
+      <div class="sechead"><b></b><i></i></div>
+      <div class="banner ${glowBanner?"glow":""}"></div>
+      ${inlineCard}
+      <div class="sechead"><b style="width:70px"></b><i></i></div>
+      <div class="grid ${glowFav?"glow":""}">${'<div class="tile"><i></i><b></b></div>'.repeat(6)}</div>
+    </div>
+    ${dim?'<div class="dim"></div>':''}${ov}
+    <div class="nav">
+      <div><b></b><i></i></div><div><b></b><i></i></div>
+      <div class="mission ${pulsing?"pulsing":""}"><b></b><i></i></div>
+      <div><b></b><i></i></div><div><b></b><i></i></div>
+    </div>`;
+}
+
+function showFrame(i){
+  const f=frames[i];viewing=i;
+  drawPhone(f.fired,f.amb);
+  const cap=document.getElementById("cap");
+  cap.className="cap"+(f.fired?" fired":"");
+  cap.innerHTML=`
+    <div class="caphead"><span class="sn">S${f.n}</span><span class="day">calendar day ${f.day}</span>
+      ${f.event?`<span class="evt">${f.event}</span>`:""}</div>
+    <h3 class="${f.fired?"":"none"}"><span class="dot"></span>${f.fired||"No blocking nudge"}</h3>
+    <div class="why">${f.why}</div>
+    ${f.tie?`<div class="tie">${f.tie}</div>`:""}
+    <div class="amb"><span class="lbl">Alongside</span>${
+      f.amb.length?f.amb.map(a=>`<span class="chip${a.startsWith("No gamification")?" grey":""}">${a}</span>`).join("")
+                  :`<span class="chip grey">nothing</span>`}</div>
+    ${f.flips.length?`<div class="flips">→ ${f.flips.map(x=>`<b>${x}</b>`).join(" · ")}</div>`:""}
+    ${f.forks&&f.forks.length?`<div class="fork"><span class="lbl">Open ruling in play</span>${f.forks.map(x=>`<p>${x}</p>`).join("")}</div>`:""}`;
+  renderRail();
+}
+
+function renderRail(){
+  const el=document.getElementById("rail");
+  if(!frames.length){el.innerHTML='<span class="lbl">Sessions</span><span class="chipS blank">none yet</span>';return;}
+  el.innerHTML='<span class="lbl">Sessions</span>'+frames.map((f,i)=>
+    `<span class="chipS ${i===viewing?"active":""}${f.fired?"":" blank"}" data-i="${i}" title="${f.fired||"nothing"}">S${f.n}</span>`).join("");
+  el.querySelectorAll(".chipS[data-i]").forEach(c=>c.addEventListener("click",()=>showFrame(+c.dataset.i)));
+}
+function snapshot(){return {notif:S.notif,smsGranted:S.smsGranted,primaryShown:S.primaryShown,taskDone:S.taskDone,smsBurned:S.smsBurned,txns:S.txns,pendingExit:S.pendingExit};}
+function renderState(before){
+  const p=S.notif?"dead":(S.primerLastNo===null||day-S.primerLastNo>=5?"ready":`${5-(day-S.primerLastNo)}d left`);
+  const rows=[["Notifications",S.notif?"given":"not given",S.notif,"notif"],
+    ["Primer timer",p,(p==="dead"||p==="ready"),null],
+    ["Group",S.tg?"TG":"CG",S.tg,null],
+    ["Gamification intro",S.primaryShown?"shown":"not shown",!S.primaryShown,"primaryShown"],
+    ["Task attempted",S.taskDone?"yes":"no",S.taskDone,"taskDone"],
+    ["SMS permission",S.smsGranted?"given":"not given",S.smsGranted,"smsGranted"],
+    ["SMS interactions",`${S.smsBurned} of 4`,S.smsBurned<4,"smsBurned"],
+    ["Purchases",String(S.txns),S.txns>0,"txns"],
+    ["Exit awaiting a popup",S.pendingExit?({tracked:"tracked",confirmed:"confirmed",none:"nothing tracked"})[S.pendingExit]:"none",!S.pendingExit,"pendingExit"],
+    ["Segment now",{new:"New",never:"Never shopped",lapsed:"Lapsed",nonfreq:"Non-frequent",freq:"Frequent"}[S.seg],true,null]];
+  document.getElementById("state").innerHTML=rows.map(r=>{
+    const ch=before&&r[3]&&String(before[r[3]])!==String(S[r[3]]);
+    return `<div class="st${ch?" changed":""}"><span class="k">${r[0]}</span><span class="v ${r[2]?"on":"off"}">${r[1]}</span></div>`;}).join("");
+}
+function renderClocks(){
+  document.getElementById("clocks").innerHTML=`calendar day <b>${day}</b> · app-open days <b>${openDays}</b> · sessions <b>${sessionNo}</b>`;
+}
+function eventLabel(){
+  const l=[];if(armed.buy)l.push("exit to a store");if(armed.task)l.push("task attempt");
+  if(armed.grant)l.push("permission granted");if(armed.ctx)l.push("contextual scheduled");
+  if(armed.xtap)l.push("X-tap dismiss");if(armed.withdraw)l.push("withdrawal");
+  return l.length?l.join(" · "):null;
+}
+function renderArmed(){document.querySelectorAll("[data-ev]").forEach(b=>b.classList.toggle("armed",!!armed[b.dataset.ev]));}
+function clearArmed(){armed={};renderArmed();}
+
+document.querySelectorAll(".seg").forEach(seg=>{
+  seg.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));init();});
+});
+document.getElementById("segment").addEventListener("change",init);
+document.getElementById("reset").addEventListener("click",init);
+document.getElementById("open").addEventListener("click",runSession);
+document.getElementById("skip").addEventListener("click",()=>{day++;renderState();renderClocks();});
+document.querySelectorAll("[data-ev]").forEach(b=>b.addEventListener("click",()=>{
+  armed[b.dataset.ev]=!armed[b.dataset.ev];renderArmed();}));
+
+init();
+</script>
+</body>
+</html>
