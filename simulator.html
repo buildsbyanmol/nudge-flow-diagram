@@ -285,7 +285,11 @@ const CONTEXTUAL = [
   {id:"f05",seg:"Frequent",  key:"New feature coach-mark",                  cad:"ONE_TIME / feature",gap:null,trig:"new_feature_launched == true · user_has_used_feature == false"},
   {id:"f06",seg:"Frequent",  key:"Gamification Hub nav tooltip",            cad:"ONE_TIME",         gap:null, trig:"gamification_hub_launched == true · user_has_opened_gamification_hub == false"}
 ];
-const SEGNAME={new:"New User",never:"New User",lapsed:"Lapsed",nonfreq:"Frequent",freq:"Frequent"};
+// The master map covers three segments only. Never shopped and Non-frequent have no contextual
+// content at all, which is finding V9 and open items #4 and #5. null means no content exists, so
+// every row shows as off-segment rather than inheriting someone else's set.
+const SEGNAME={new:"New User",lapsed:"Lapsed",freq:"Frequent",never:null,nonfreq:null};
+const SEGLABEL={new:"New",never:"Never shopped",lapsed:"Lapsed",nonfreq:"Non-frequent",freq:"Frequent"};
 const CTX=id=>CONTEXTUAL.find(c=>c.id===id);
 
 let S, day, sessionNo, openDays, lastOpenDay, armed, frames, viewing;
@@ -296,8 +300,8 @@ function init(){
   const gv=k=>document.querySelector(`.seg[data-k="${k}"] button[aria-pressed="true"]`).dataset.v;
   S={seg,notif:g("notif"),tg:g("tg"),smsGranted:g("sms"),balance:g("bal"),
      primerLastNo:null,primaryShown:g("prim"),tabOpened:false,taskDone:false,
-     smsBurned:0,smsLastDay:null,lapsedComeback:false,lapsedWeek:null,
-     withdrawSeen:null,lastWithdrawal:null,pendingExit:null,
+     smsBurned:0,smsLastDay:null,lapsedComeback:false,
+     lastWithdrawal:null,pendingExit:null,
      txns:0,exitKind:gv("exit"),forksSeen:{},ctxPick:[],ctxSeen:{}};
   day=0;sessionNo=0;openDays=0;lastOpenDay=null;armed={};frames=[];viewing=null;
   renderState();renderClocks();renderArmed();renderRail();renderCtxPanel();closeCtx();
@@ -349,9 +353,9 @@ function runSession(){
     if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return cycle");}
     if(fired.startsWith("First transaction tracked"))fork("mysterybox","Master map Note C: the sheet describes a Mystery Box scratch card, the Figma shows a transaction-tracked celebration. Spec versus design, unresolved at source.");
     if(fired.startsWith("Gamification Hub nav"))tie=(tie?tie+" ":"")+"Ruling #2: this is the same Introducing Missions launch as the P3 primary nudge, delivered as a nav dot instead of a takeover. One screen, two mechanisms, two owners.";
-    if(fired.startsWith("Withdraw")){S.withdrawSeen=day;flips.push("withdraw nudge on a 30-day cadence");
+    if(fired.startsWith("Withdraw")){flips.push("withdraw nudge on a 30-day cadence");
       fork("withdraw","The master map gates this on 30 days since the last withdrawal. The workbook gates it on 30 days since the nudge last fired. Different rule: only one of them stops when the user actually withdraws.");}
-    if(fired.startsWith("Buy-push")){S.lapsedWeek=day;flips.push("buy-push on a 7-day gap");
+    if(fired.startsWith("Buy-push")){flips.push("buy-push on a 7-day gap");
       fork("buypush","The master map trigger is behavioural and inside a single session: 2 or more homepage visits with no store visit. The workbook uses second session onward, weekly. This walk uses the workbook.");}
   }
 
@@ -537,7 +541,9 @@ function clearArmed(){armed={};renderArmed();}
 function renderCtxPanel(){
   const here=SEGNAME[S.seg];
   let html=`<div class="ctxhead"><span class="t">Pick a contextual</span><button class="x" id="ctxclose">Done</button></div>
-    <div class="ctxsub">All of these sit at P1 with no order between them. Arm more than one to see the collision. Segment now: ${here}.</div>`;
+    <div class="ctxsub">All of these sit at P1 with no order between them. Arm more than one to see the collision. ${here
+      ? `Segment now: ${here}.`
+      : `Segment now: ${SEGLABEL[S.seg]}, which has no contextual content in the master map at all. Every row below is off-segment. That is gaps #4 and #5.`}</div>`;
   ["New User","Lapsed","Frequent"].forEach(g=>{
     const rows=CONTEXTUAL.filter(c=>c.seg===g);
     if(!rows.length)return;
