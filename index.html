@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homepage Nudge Order — Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f2eee4; --paper-2:#e9e4d6; --ink:#16150f; --ink-2:#4a4739;
+  --muted:#8a8574; --rule:#cdc6b3; --rule-2:#ded8c8;
+  --signal:#d8481f; --signal-soft:#f6dcd2; --go:#1d6b52;
+  --shadow:6px 6px 0 rgba(22,21,15,.09);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  background-image:
+    linear-gradient(to right, rgba(22,21,15,.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22,21,15,.035) 1px, transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink); font-family:"IBM Plex Sans",sans-serif; font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 28px 80px}
+
+header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:34px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);font-weight:600}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(32px,5.4vw,56px);line-height:.95;letter-spacing:-.03em;margin:10px 0 12px}
+h1 em{font-style:normal;color:var(--signal)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2)}
+.meta b{color:var(--ink);font-weight:600}
+
+section{margin-top:52px}
+.sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:9px;margin-bottom:8px}
+.sec-num{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:var(--signal);letter-spacing:.1em}
+.sec-head h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:23px;letter-spacing:-.02em;margin:0}
+.sec-note{font-size:13px;color:var(--ink-2);max-width:74ch;margin:0 0 22px}
+
+.panel{background:var(--paper-2);border:1.5px solid var(--ink);box-shadow:var(--shadow);padding:18px 20px 20px;margin-bottom:26px}
+.panel-title{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:14px 22px}
+.ctrl{display:flex;flex-direction:column;gap:5px}
+.ctrl label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-2)}
+.seg{display:flex;border:1.2px solid var(--ink);background:var(--paper)}
+.seg button{flex:1;appearance:none;border:0;background:transparent;cursor:pointer;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;padding:6px 4px;color:var(--ink-2);transition:background .12s,color .12s}
+.seg button+button{border-left:1.2px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+select{font-family:"IBM Plex Mono",monospace;font-size:11px;padding:6px 8px;border:1.2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0}
+
+.ladder{position:relative;padding-left:34px}
+.ladder:before{content:"";position:absolute;left:11px;top:14px;bottom:52px;width:1.5px;background:var(--rule)}
+.entry,.exit{position:relative;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-left:-34px;padding:8px 14px;display:inline-block;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper)}
+.exit{background:var(--paper);color:var(--ink-2);border-style:dashed;margin-top:14px}
+.rung{position:relative;display:grid;grid-template-columns:44px 1fr 158px;align-items:stretch;border:1.5px solid var(--rule);background:var(--paper);margin-top:12px;transition:border-color .15s,box-shadow .15s}
+.rung:before{content:"";position:absolute;left:-23px;top:50%;width:23px;height:1.5px;background:var(--rule)}
+.rung.fires{border-color:var(--ink);box-shadow:var(--shadow);background:var(--signal-soft)}
+.rung.unreached{opacity:.42}
+.rank{display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;border-right:1.5px solid var(--rule);background:var(--paper-2);color:var(--ink-2)}
+.rung.fires .rank{background:var(--signal);color:#fff;border-right-color:var(--ink)}
+.rbody{padding:11px 15px}
+.rname{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:15.5px;letter-spacing:-.01em}
+.rcond{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);margin-top:3px;line-height:1.5}
+.verdict{display:flex;align-items:center;justify-content:flex-end;padding:0 14px;border-left:1.5px dashed var(--rule);font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;text-align:right;color:var(--muted)}
+.rung.fires .verdict{color:var(--signal);border-left-color:var(--ink)}
+.fallthrough{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--muted);letter-spacing:.1em;padding:5px 0 0 4px}
+
+.diagram{border:1.5px solid var(--ink);background:var(--paper);box-shadow:var(--shadow);padding:18px 10px}
+.diagram svg{width:100%;height:auto;display:block}
+.svg-dia text{font-family:"IBM Plex Mono",monospace}
+
+.sidebar{margin-top:18px;border-left:3px solid var(--go);padding:12px 0 12px 15px;background:linear-gradient(90deg, rgba(29,107,82,.06), transparent 70%)}
+.sidebar h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;font-size:15px;margin:0 0 5px}
+.sidebar p{margin:0;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);line-height:1.65}
+
+footer{margin-top:58px;padding-top:16px;border-top:2px solid var(--ink);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+@media(max-width:660px){
+  .rung{grid-template-columns:38px 1fr}
+  .verdict{grid-column:1/-1;justify-content:flex-start;border-left:0;border-top:1.5px dashed var(--rule);padding:7px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">CashKaro · Homepage · Nudge order</div>
+  <h1>Which nudge <em>fires</em></h1>
+  <div class="meta">
+    <span><b>Scope</b> homepage only</span>
+    <span><b>Rule</b> one nudge per session</span>
+    <span><b>Winner</b> highest eligible priority</span>
+    <span><b>Version</b> 20 Aug 2026</span>
+  </div>
+</header>
+
+<!-- ===== 01 ===== -->
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>Try it</h2></div>
+  <p class="sec-note">Every homepage session runs down this list once, top to bottom. The first nudge whose conditions are met fires, and nothing below it is even checked. Change the user state to see which one wins.</p>
+
+  <div class="panel">
+    <div class="panel-title">User state</div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Contextual notification</label>
+        <div class="seg" data-k="ctx"><button data-v="no" aria-pressed="true">Off</button><button data-v="yes" aria-pressed="false">On</button></div></div>
+
+      <div class="ctrl"><label>Notifications allowed by user</label>
+        <div class="seg" data-k="notif"><button data-v="no" aria-pressed="true">No</button><button data-v="yes" aria-pressed="false">Yes</button></div></div>
+
+      <div class="ctrl"><label>Last said no to push primer</label>
+        <div class="seg" data-k="cool"><button data-v="no" aria-pressed="true">5+ days ago</button><button data-v="yes" aria-pressed="false">Within 5 days</button></div></div>
+
+      <div class="ctrl"><label>Gamification group</label>
+        <div class="seg" data-k="grp"><button data-v="TG" aria-pressed="true">TG</button><button data-v="CG" aria-pressed="false">CG</button></div></div>
+
+      <div class="ctrl"><label>Primary nudge already shown</label>
+        <div class="seg" data-k="prim"><button data-v="no" aria-pressed="true">No</button><button data-v="yes" aria-pressed="false">Yes</button></div></div>
+
+      <div class="ctrl"><label>Opened gamification tab</label>
+        <div class="seg" data-k="tab"><button data-v="no" aria-pressed="true">No</button><button data-v="yes" aria-pressed="false">Yes</button></div></div>
+
+      <div class="ctrl"><label>SMS day conditions</label>
+        <div class="seg" data-k="sms"><button data-v="yes" aria-pressed="true">Met</button><button data-v="no" aria-pressed="false">Not met</button></div></div>
+
+      <div class="ctrl"><label>What happened on the last exit</label>
+        <select id="exit">
+          <option value="none">Nothing, no exit</option>
+          <option value="confirm">Cashback confirmed</option>
+          <option value="tracking">Cashback tracked</option>
+          <option value="postexit">Exited, nothing tracked yet</option>
+        </select></div>
+    </div>
+  </div>
+
+  <div class="ladder">
+    <div class="entry">Homepage session opens</div>
+
+    <div class="rung" data-id="ctx">
+      <div class="rank">P1</div>
+      <div class="rbody">
+        <div class="rname">Contextual nudge</div>
+        <div class="rcond">contextual notification is switched on for this user</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="push">
+      <div class="rank">P2</div>
+      <div class="rbody">
+        <div class="rname">Push primer</div>
+        <div class="rcond">user has not allowed notifications, and it has been 5 or more calendar days since they last said no or ignored it</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="prim">
+      <div class="rank">P3</div>
+      <div class="rbody">
+        <div class="rname">Gamification primary nudge</div>
+        <div class="rcond">user is in TG, has never been shown this nudge, and has not opened the gamification tab</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="sms">
+      <div class="rank">P4</div>
+      <div class="rbody">
+        <div class="rname">SMS reading</div>
+        <div class="rcond">SMS permission not given, alternate app-open day, first open of the day, under 4 lifetime interactions, and push primer has not fired today</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="confirm">
+      <div class="rank">P5</div>
+      <div class="rbody">
+        <div class="rname">Cashback confirm</div>
+        <div class="rcond">cashback was confirmed on the last exit</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="tracking">
+      <div class="rank">P6</div>
+      <div class="rbody">
+        <div class="rname">Tracking</div>
+        <div class="rcond">cashback was tracked on the last exit</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+    <div class="fallthrough">↓ not eligible, check the next one</div>
+
+    <div class="rung" data-id="postexit">
+      <div class="rank">P7</div>
+      <div class="rbody">
+        <div class="rname">Post exit</div>
+        <div class="rcond">user exited to a store and came back, nothing tracked yet</div>
+      </div>
+      <div class="verdict"></div>
+    </div>
+
+    <div class="exit" id="noneExit">No nudge this session</div>
+  </div>
+</section>
+
+<!-- ===== 02 ===== -->
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>Flow diagram</h2></div>
+  <p class="sec-note">The same logic as a decision flow. Any SHOW box ends the session. A nudge that is skipped was never displayed, so its own counter does not move and it stays eligible for a later session.</p>
+
+  <div class="diagram">
+  <svg class="svg-dia" viewBox="0 0 900 1136" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Homepage nudge decision flow">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#16150f"/>
+      </marker>
+    </defs>
+
+    <!-- start -->
+    <rect x="120" y="20" width="260" height="46" rx="23" fill="#16150f"/>
+    <text x="250" y="49" text-anchor="middle" font-size="12.5" font-weight="600" fill="#f2eee4" letter-spacing="1.4">HOMEPAGE SESSION OPENS</text>
+    <line x1="250" y1="66" x2="250" y2="104" stroke="#16150f" stroke-width="1.6" marker-end="url(#a)"/>
+
+    <!-- note -->
+    <text x="700" y="34" text-anchor="middle" font-size="10.5" fill="#8a8574">Any SHOW box ends the session.</text>
+    <text x="700" y="50" text-anchor="middle" font-size="10.5" fill="#8a8574">Nothing below it is checked.</text>
+
+    <g id="nodes"></g>
+
+    <!-- end -->
+    <rect x="105" y="1032" width="290" height="48" fill="none" stroke="#4a4739" stroke-width="1.6" stroke-dasharray="6 4"/>
+    <text x="250" y="1061" text-anchor="middle" font-size="12" font-weight="600" fill="#4a4739" letter-spacing="1.2">NO NUDGE THIS SESSION</text>
+  </svg>
+  </div>
+
+  <div class="sidebar">
+    <h4>Runs in parallel, outside this flow</h4>
+    <p>The gamification secondary nudge is only the mission logo animating. It is not a popup, it does not enter this flow, and it does not use up the one-nudge-per-session slot. It starts once the primary nudge is done and runs every session until the user attempts a task for the first time, up to 5 times per session with a 5 second gap between repeats.</p>
+  </div>
+</section>
+
+<footer>
+  <span>Homepage nudge order · addendum to the main gamification PRD</span>
+  <span>One nudge per session · highest eligible priority wins</span>
+</footer>
+
+</div>
+
+<script>
+/* ---------- shared node data ---------- */
+const NODES = [
+  {id:"ctx",      p:"P1", q:["Contextual notification","switched ON for this user?"],      show:"Contextual nudge"},
+  {id:"push",     p:"P2", q:["Notifications not allowed AND","5+ days since last no?"],    show:"Push primer"},
+  {id:"prim",     p:"P3", q:["In TG, never shown before,","tab not opened?"],              show:"Gamification primary nudge"},
+  {id:"sms",      p:"P4", q:["SMS day conditions met AND","push primer not fired today?"], show:"SMS reading"},
+  {id:"confirm",  p:"P5", q:["Cashback confirmed","on the last exit?"],                    show:"Cashback confirm"},
+  {id:"tracking", p:"P6", q:["Cashback tracked","on the last exit?"],                      show:"Tracking"},
+  {id:"postexit", p:"P7", q:["Exited to a store,","nothing tracked yet?"],                 show:"Post exit"}
+];
+
+/* ---------- draw the SVG flow ---------- */
+(function draw(){
+  const CX = 250, HW = 196, HH = 46, TOP = 150, GAP = 132;
+  let s = "";
+  NODES.forEach((n,i)=>{
+    const cy = TOP + i*GAP;
+    // diamond
+    s += `<path d="M ${CX-HW} ${cy} L ${CX} ${cy-HH} L ${CX+HW} ${cy} L ${CX} ${cy+HH} Z" fill="#f2eee4" stroke="#16150f" stroke-width="1.6"/>`;
+    s += `<text x="${CX-HW+22}" y="${cy+4}" font-size="10.5" font-weight="600" fill="#d8481f">${n.p}</text>`;
+    s += `<text x="${CX}" y="${cy-3}" text-anchor="middle" font-size="11" fill="#16150f">${n.q[0]}</text>`;
+    s += `<text x="${CX}" y="${cy+13}" text-anchor="middle" font-size="11" fill="#16150f">${n.q[1]}</text>`;
+    // yes branch
+    s += `<line x1="${CX+HW}" y1="${cy}" x2="${524}" y2="${cy}" stroke="#16150f" stroke-width="1.6" marker-end="url(#a)"/>`;
+    s += `<text x="${CX+HW+26}" y="${cy-9}" font-size="10" font-weight="600" fill="#1d6b52" letter-spacing="1">YES</text>`;
+    s += `<rect x="530" y="${cy-24}" width="330" height="48" fill="#f6dcd2" stroke="#16150f" stroke-width="1.6"/>`;
+    s += `<text x="551" y="${cy+5}" font-size="10.5" font-weight="600" fill="#d8481f" letter-spacing="1.1">SHOW</text>`;
+    s += `<text x="600" y="${cy+5}" font-size="12" font-weight="600" fill="#16150f">${n.show}</text>`;
+    // no branch
+    const nextTop = (i < NODES.length-1) ? (TOP + (i+1)*GAP - HH) : 1032;
+    s += `<line x1="${CX}" y1="${cy+HH}" x2="${CX}" y2="${nextTop-4}" stroke="#16150f" stroke-width="1.6" marker-end="url(#a)"/>`;
+    s += `<text x="${CX+12}" y="${cy+HH+24}" font-size="10" font-weight="600" fill="#8a8574" letter-spacing="1">NO</text>`;
+  });
+  document.getElementById("nodes").innerHTML = s;
+})();
+
+/* ---------- interactive ladder ---------- */
+const S = {ctx:"no",notif:"no",cool:"no",grp:"TG",prim:"no",tab:"no",sms:"yes",exit:"none"};
+
+function evaluate(){
+  const e = {
+    ctx:      S.ctx==="yes",
+    push:     S.notif==="no" && S.cool==="no",
+    prim:     S.grp==="TG" && S.prim==="no" && S.tab==="no",
+    sms:      S.sms==="yes",
+    confirm:  S.exit==="confirm",
+    tracking: S.exit==="tracking",
+    postexit: S.exit==="postexit"
+  };
+  const order = NODES.map(n=>n.id);
+  let winner = null;
+  for (const k of order){ if(e[k]){ winner = k; break; } }
+
+  let past = false;
+  order.forEach(k=>{
+    const el = document.querySelector(`.rung[data-id="${k}"]`);
+    const v  = el.querySelector(".verdict");
+    el.classList.remove("fires","unreached");
+    if(k===winner){ el.classList.add("fires"); v.textContent="◆ Fires"; past = true; }
+    else if(!past){ v.textContent="not eligible"; }
+    else { el.classList.add("unreached"); v.textContent="not checked"; }
+  });
+
+  document.getElementById("noneExit").style.opacity = winner ? .3 : 1;
+  document.querySelectorAll(".fallthrough").forEach((f,i)=>{
+    f.style.opacity = (winner && order.indexOf(winner) <= i) ? .2 : 1;
+  });
+}
+
+document.querySelectorAll(".seg").forEach(seg=>{
+  seg.addEventListener("click", ev=>{
+    const b = ev.target.closest("button"); if(!b) return;
+    seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", x===b?"true":"false"));
+    S[seg.dataset.k] = b.dataset.v;
+    evaluate();
+  });
+});
+document.getElementById("exit").addEventListener("change", e=>{ S.exit = e.target.value; evaluate(); });
+
+evaluate();
+</script>
+</body>
+</html>
