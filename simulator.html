@@ -347,7 +347,7 @@ function runSession(){
   if(ctxList.length){
     fired=ctxList[0];
     why="A contextual nudge is eligible, and contextual sits at the top of the order.";
-    if(ctxList.length>1)tie="Also eligible this session: "+ctxList.slice(1).join(" · ")+". The tie-break between contextual nudges is not decided (Ruling #6). P1 holds 23 nudges in total and none of them are ordered against each other.";
+    if(ctxList.length>1)tie="Also eligible this session: "+ctxList.slice(1).join(" · ")+". The tie-break between contextual nudges is not decided (Ruling #6). P1 arbitrates the 14 homepage-scoped nudges with no order between them, and the other 9 fire on their own screens where nothing arbitrates them at all.";
     const won=CONTEXTUAL.find(c=>c.key===fired);
     if(won){S.ctxSeen[won.id]=day;flips.push(`${won.id} shown · cadence ${won.cad}`);}
     if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return cycle");}
