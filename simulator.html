@@ -178,7 +178,7 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
   <div class="meta">
     <span><b>Set</b> a starting condition</span>
     <span><b>Step</b> through sessions and days</span>
-    <span><b>Rules</b> decide what renders, not a script</span>
+    <span><b>The rules</b> pick the nudge, nothing is scripted</span>
     <span><b>Version</b> 20 Aug 2026 · fact-checked 21 Aug</span>
   </div>
 </header>
@@ -187,7 +187,7 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
   <div>
     <div class="panel">
       <div class="panel-title">Starting condition</div>
-      <div class="ctrl"><label>Segment</label>
+      <div class="ctrl"><label>User type</label>
         <select id="segment">
           <option value="new">New</option><option value="never">Never shopped</option>
           <option value="lapsed">Lapsed</option><option value="nonfreq">Non-frequent</option>
@@ -195,15 +195,15 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
         </select></div>
       <div class="ctrl"><label>Notification permission</label>
         <div class="seg" data-k="notif"><button data-v="0" aria-pressed="true">Not given</button><button data-v="1" aria-pressed="false">Given</button></div></div>
-      <div class="ctrl"><label>Gamification group</label>
+      <div class="ctrl"><label>Missions group</label>
         <div class="seg" data-k="tg"><button data-v="1" aria-pressed="true">TG</button><button data-v="0" aria-pressed="false">CG</button></div></div>
-      <div class="ctrl"><label>Gamification intro</label>
+      <div class="ctrl"><label>Missions intro</label>
         <div class="seg" data-k="prim"><button data-v="0" aria-pressed="true">Not yet seen</button><button data-v="1" aria-pressed="false">Already seen</button></div></div>
       <div class="ctrl"><label>SMS permission</label>
         <div class="seg" data-k="sms"><button data-v="0" aria-pressed="true">Not given</button><button data-v="1" aria-pressed="false">Given</button></div></div>
-      <div class="ctrl"><label>What happens on that exit</label>
+      <div class="ctrl"><label>What happens at the store</label>
         <div class="seg" data-k="exit"><button data-v="tracked" aria-pressed="true">Tracked</button><button data-v="confirmed" aria-pressed="false">Confirmed</button><button data-v="none" aria-pressed="false">Nothing</button></div></div>
-      <div class="ctrl"><label>Confirmed balance (lapsed rules)</label>
+      <div class="ctrl"><label>Confirmed balance</label>
         <div class="seg" data-k="bal"><button data-v="0" aria-pressed="true">Zero</button><button data-v="1" aria-pressed="false">Has balance</button></div></div>
       <button class="btn ghost tiny" id="reset" style="margin-top:4px">Reset journey</button>
     </div>
@@ -214,17 +214,17 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
       <button class="btn ghost" id="skip">Skip a day</button>
       <div class="panel-title" style="margin:13px 0 8px">Do this in the next session</div>
       <div class="btnrow">
-        <button class="btn ghost tiny" data-ev="buy">Exit to a store</button>
-        <button class="btn ghost tiny" data-ev="task">Attempt a task</button>
+        <button class="btn ghost tiny" data-ev="buy">Go to a store</button>
+        <button class="btn ghost tiny" data-ev="task">Try a task</button>
         <button class="btn ghost tiny" data-ev="grant">Grant permission</button>
         <button class="btn ghost tiny" id="ctxopen">Pick contextual</button>
-        <button class="btn ghost tiny" data-ev="xtap">Dismiss with X</button>
-        <button class="btn ghost tiny" data-ev="withdraw">Withdraw balance</button>
+        <button class="btn ghost tiny" data-ev="xtap">Tap X to dismiss</button>
+        <button class="btn ghost tiny" data-ev="withdraw">Withdraw money</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">Live conditions</div>
+      <div class="panel-title">Where things stand</div>
       <div id="state"></div>
       <div class="clocks" id="clocks"></div>
     </div>
@@ -241,8 +241,8 @@ footer{margin-top:40px;padding-top:13px;border-top:2px solid var(--ink);font-fam
 </div>
 
 <footer>
-  <span>Homepage only · one blocking nudge per session · ambient runs alongside</span>
-  <span>Open rulings are shown, never resolved</span>
+  <span>Homepage only · one popup per session · quiet nudges run alongside</span>
+  <span>Open questions are shown, never answered</span>
 </footer>
 </div>
 
@@ -251,7 +251,7 @@ const RENDER = {
   "Push primer":{type:"modal",tag:"Popup",t:"Turn on notifications",b:"Get alerts when your cashback tracks and confirms.",cta:["Not now","Allow"]},
   "Gamification primary nudge":{type:"take",tag:"Full screen",t:"Introducing Missions",b:"Complete simple tasks and earn bonus cashback.",cta:["Maybe later","Explore"]},
   "SMS reading bottom sheet":{type:"sheet",tag:"Bottom sheet",t:"Allow SMS reading",b:"We read order messages so your cashback tracks faster.",cta:["Not now","Allow"]},
-  "Withdraw-your-balance nudge":{type:"modal",tag:"Popup",t:"Your balance is waiting",b:"Confirmed cashback is sitting in your account.",cta:["Later","Withdraw"]},
+  "Withdraw-your-balance nudge":{type:"modal",tag:"Popup",t:"Your money is waiting",b:"Take out the cashback you have already earned, then see which stores pay more now.",cta:["Later","Withdraw"]},
   "Comeback offer (rates improved since you left)":{type:"take",tag:"Full screen",t:"Welcome back",b:"Cashback rates went up while you were away.",cta:["Close","Start shopping"]},
   "Buy-push: rates increased since you left":{type:"inline",tag:"Inline card",t:"Rates increased since you left",b:"See what your favourite stores pay now.",cta:["Start shopping"]},
   "Onboarding coach-mark walkthrough":{type:"spot",tag:"Coach-mark 1 of 4",t:"Start with search",b:"Step 1 of 4: search, then categories, offers for you, tutorials.",cta:["Skip","Next"]},
@@ -261,7 +261,7 @@ const RENDER = {
   "First transaction tracked sheet":{type:"sheet",tag:"Bottom sheet",t:"Transaction tracked",b:"Your first order tracked. Open the reward to see what you earned.",cta:["Later","Open reward"]},
   "New feature coach-mark":{type:"spot",tag:"Coach-mark",t:"New feature is live",b:"Try it from here. Shows at most twice more if ignored.",cta:["Dismiss","Try it"]},
   "Gamification Hub nav tooltip":{type:"spot",tag:"Nav tooltip",t:"Missions is live in the nav",b:"Dot shows for the first 3 sessions, tooltip on the first.",cta:["Got it","Open"]},
-  "Cashback tracked popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback tracked",b:"We are tracking your order. Cashback confirms after the return window.",cta:["Close","View order"]},
+  "Cashback tracked popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback tracked",b:"We are tracking your order. Your cashback confirms once the order is final.",cta:["Close","View order"]},
   "Cashback confirm popup":{type:"sheet",tag:"Bottom sheet",t:"Cashback confirmed",b:"Your cashback is confirmed and ready to withdraw.",cta:["Close","View earnings"]},
   "Did you shop popup":{type:"sheet",tag:"Bottom sheet",t:"Did you shop?",b:"We could not track an order from your last store visit.",cta:["No","Yes, I shopped"]}
 };
@@ -291,6 +291,9 @@ const CONTEXTUAL = [
 const SEGNAME={new:"New User",lapsed:"Lapsed",freq:"Frequent",never:null,nonfreq:null};
 const SEGLABEL={new:"New",never:"Never shopped",lapsed:"Lapsed",nonfreq:"Non-frequent",freq:"Frequent"};
 const CTX=id=>CONTEXTUAL.find(c=>c.id===id);
+const PLAIN={"ONE_TIME":"once ever","ONE_TIME / return cycle":"once per return",
+  "ONE_TIME / feature":"once per new feature","ONCE_PER_SESSION":"every session",
+  "ONCE_PER_WEEK":"once a week","ONCE_PER_MONTH":"once a month"};
 
 let S, day, sessionNo, openDays, lastOpenDay, armed, frames, viewing;
 
@@ -308,7 +311,7 @@ function init(){
   drawPhone(null,[]);
   const cap=document.getElementById("cap");
   cap.className="cap";
-  cap.innerHTML=`<div class="why">No sessions yet. Set a starting condition, then press <b>Open app</b>. The phone shows exactly what renders in that session.</div>`;
+  cap.innerHTML=`<div class="why">No sessions yet. Set a starting condition, then press <b>Open app</b>. The phone shows exactly what a user would see in that session.</div>`;
 }
 
 function runSession(){
@@ -320,7 +323,7 @@ function runSession(){
   let fired=null,why="",tie=null,primerFiredToday=false;
   const fork=(k,t)=>{if(!S.forksSeen[k]){S.forksSeen[k]=true;forks.push(t);}};
 
-  if(sessionNo===1)fork("session","\"Session\" is a homepage visit in the logic doc and an app open in every per-session rule. This walk counts one session per app open. The one-per-session cap on post exit only binds under the app-open reading.");
+  if(sessionNo===1)fork("session","\"Session\" means a homepage visit in the logic doc and an app open in every other rule. This walk counts one per app open. The one-popup-per-session cap only does anything on the app-open reading.");
 
   // P1. A contextual is eligible either because its own conditions hold for this segment, or
   // because growth scheduled it in the picker. Cadence applies either way.
@@ -346,46 +349,46 @@ function runSession(){
 
   if(ctxList.length){
     fired=ctxList[0];
-    why="A contextual nudge is eligible, and contextual sits at the top of the order.";
-    if(ctxList.length>1)tie="Also eligible this session: "+ctxList.slice(1).join(" · ")+". The tie-break between contextual nudges is not decided (Ruling #6). P1 arbitrates the 14 homepage-scoped nudges with no order between them, and the other 9 fire on their own screens where nothing arbitrates them at all.";
+    why="A contextual nudge is due, and contextual goes first in the order.";
+    if(ctxList.length>1)tie="Also due this session: "+ctxList.slice(1).join(" · ")+". Nobody has decided which contextual wins when two are due at once. That is open question #6. Fourteen of them compete for this one place and no rule ranks them, and the other nine sit on other screens with no rule at all.";
     const won=CONTEXTUAL.find(c=>c.key===fired);
-    if(won){S.ctxSeen[won.id]=day;flips.push(`${won.id} shown · cadence ${won.cad}`);}
-    if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return cycle");}
-    if(fired.startsWith("First transaction tracked"))fork("mysterybox","Master map Note C: the sheet describes a Mystery Box scratch card, the Figma shows a transaction-tracked celebration. Spec versus design, unresolved at source.");
-    if(fired.startsWith("Gamification Hub nav"))tie=(tie?tie+" ":"")+"Ruling #2: this is the same Introducing Missions launch as the P3 primary nudge, delivered as a nav dot instead of a takeover. One screen, two mechanisms, two owners.";
-    if(fired.startsWith("Withdraw")){flips.push("withdraw nudge on a 30-day cadence");
-      fork("withdraw","The master map gates this on 30 days since the last withdrawal. The workbook gates it on 30 days since the nudge last fired. Different rule: only one of them stops when the user actually withdraws.");}
-    if(fired.startsWith("Buy-push")){flips.push("buy-push on a 7-day gap");
-      fork("buypush","The master map trigger is behavioural and inside a single session: 2 or more homepage visits with no store visit. The workbook uses second session onward, weekly. This walk uses the workbook.");}
+    if(won){S.ctxSeen[won.id]=day;flips.push(`${won.id} shown · repeats ${PLAIN[won.cad]||won.cad}`);}
+    if(fired.startsWith("Comeback")){S.lapsedComeback=true;flips.push("comeback used up for this return");}
+    if(fired.startsWith("First transaction tracked"))fork("mysterybox","The spec sheet calls this a Mystery Box scratch card. The design shows a plain tracked celebration. Two different screens for one nudge, and the source never settles it.");
+    if(fired.startsWith("Gamification Hub nav"))tie=(tie?tie+" ":"")+"Open question #2: this is the same Introducing Missions launch as the P3 popup, shown as a nav dot instead of a full screen. One screen, two ways to show it, two owners.";
+    if(fired.startsWith("Withdraw")){flips.push("withdraw nudge now waits 30 days");
+      fork("withdraw","The nudge map counts 30 days since the user last took money out. The old workbook counted 30 days since the nudge last showed. Only one of those stops when the user actually withdraws.");}
+    if(fired.startsWith("Buy-push")){flips.push("buy-push now waits 7 days");
+      fork("buypush","The nudge map triggers this inside one visit: two homepage views and no store visit. The workbook triggers it from the second session, once a week. This walk uses the workbook.");}
   }
 
   if(!fired&&!S.notif&&(S.primerLastNo===null||day-S.primerLastNo>=5)){
     fired="Push primer";
-    why="Notifications not given, and 5 or more calendar days since the last no.";
+    why="Notifications are still off, and it has been 5 days or more since the last no.";
     primerFiredToday=true;
-    if(armed.grant){S.notif=true;armed.grant=false;flips.push("permission GIVEN · primer dead for life");}
-    else{S.primerLastNo=day;flips.push("5-day calendar timer restarts");}
+    if(armed.grant){S.notif=true;armed.grant=false;flips.push("permission given · this popup never comes back");}
+    else{S.primerLastNo=day;flips.push("5-day wait restarts");}
   }
 
   if(!fired&&S.tg&&!S.primaryShown&&!S.tabOpened){
     fired="Gamification primary nudge";
-    why="In TG, never shown before, gamification tab not opened.";
-    if(S.seg!=="new")tie="Ruling #2: this is the same full-screen Introducing Missions screen that the master map delivers as a Frequent nav-dot takeover. One screen, two delivery mechanisms, two owners. Not decided.";
-    S.primaryShown=true;flips.push("primary consumed, gone for life · mission pulse switches on");
+    why="This user is in the test group, has never seen this screen, and has not opened the Missions tab.";
+    if(S.seg!=="new")tie="Open question #2: this is the same Introducing Missions screen that also exists as a nav dot for frequent users. One screen, two ways to show it, two owners. Not decided.";
+    S.primaryShown=true;flips.push("shown once, never again · logo pulse starts");
   }
 
   const smsAlive=!S.smsGranted&&S.smsBurned<4;
   const smsDay=smsAlive&&isNewOpenDay&&(S.smsLastDay===null||openDays-S.smsLastDay>=2)&&!primerFiredToday;
   if(!fired&&smsDay){
     fired="SMS reading bottom sheet";
-    why="Alternate app-open day, first open of the day, primer did not fire today, under 4 lifetime interactions.";
+    why="It is an every-other-day slot, this is the first open today, the notification popup did not show today, and they have dismissed it fewer than 4 times.";
     S.smsLastDay=openDays;
     const granted=!!armed.grant, xtapped=!!armed.xtap;
-    if(granted){S.smsGranted=true;armed.grant=false;flips.push("SMS permission GIVEN · sheet dead for life");}
-    else if(xtapped){S.smsBurned++;armed.xtap=false;flips.push(`X-tap dismiss · SMS interaction ${S.smsBurned} of 4 burned`);
-      if(S.smsBurned>=3)fork("smscap","The logic doc reads as five displays (lifetime interactions at most 4). Both workbooks read as four. This walk uses four.");}
-    else{flips.push("ignored, not dismissed · nothing burned, the sheet returns on the next alternate app-open day");
-      fork("smsignore","Only an X-tap or a permission grant burns an interaction. A user who ignores the sheet never reaches the 4-interaction cap, so this loop has no terminating condition.");}
+    if(granted){S.smsGranted=true;armed.grant=false;flips.push("SMS permission given · sheet never comes back");}
+    else if(xtapped){S.smsBurned++;armed.xtap=false;flips.push(`tapped X · dismissal ${S.smsBurned} of 4`);
+      if(S.smsBurned>=3)fork("smscap","The logic doc reads as 5 dismissals allowed. Both workbooks read as 4. This walk uses 4.");}
+    else{flips.push("ignored, not dismissed · nothing counted, so it returns in two app-open days");
+      fork("smsignore","Only tapping X or granting permission counts towards the cap. Someone who just ignores the sheet never reaches 4, so it keeps coming back with nothing to stop it.");}
   }
 
   if(!fired&&S.pendingExit){
@@ -394,41 +397,41 @@ function runSession(){
                none:["Did you shop popup","nothing tracked from that exit"]};
     const [pop,txt]=map[S.pendingExit];
     fired=pop;
-    why="Back on the homepage after the exit in an earlier session, and "+txt+".";
-    if(S.pendingExit==="confirmed")fork("threeplusone","The PRD addendum example still gates cashback confirm on 3+1. The logic doc says 3+1 gates nothing and confirm fires for all users. This walk follows the logic doc.");
-    if(S.pendingExit==="tracked"&&S.seg==="new"&&S.txns===1)fork("tracked","Ruling #3: the master map also fires a transaction-tracked celebration on the next app open after the first transaction. Same fact, two screens, sessions apart.");
+    why="Back on the homepage after that store visit, and "+txt+".";
+    if(S.pendingExit==="confirmed")fork("threeplusone","The PRD still says this only shows to users under 3+1. The logic doc says 3+1 blocks nothing and it shows to everyone. This walk follows the logic doc.");
+    if(S.pendingExit==="tracked"&&S.seg==="new"&&S.txns===1)fork("tracked","Open question #3: there is also a tracked celebration on the next app open. Same news, two screens, a session apart.");
     S.pendingExit=null;
   }else if(S.pendingExit){
-    why+=" The post-exit popup from the earlier exit was also eligible but lost the slot, so its counter did not move and it stays pending.";
+    why+=" The popup from that store visit was also due, but it lost the place. It does not count as shown, so it waits for the next session.";
   }
 
   if(armed.buy){
     if(S.exitKind!=="none")S.txns++;
-    if(S.pendingExit)flips.push("a second exit overwrites the pending post-exit popup");
+    if(S.pendingExit)flips.push("a second store visit replaces the one that was waiting");
     S.pendingExit=S.exitKind;
-    flips.push("exited to a store · the post-exit popup is checked from the next session, never this one");
-    if(S.seg==="lapsed"&&S.exitKind!=="none"){flips.push("purchase ends the lapsed rules · moves to Non-frequent");S.seg="nonfreq";}
+    flips.push("went to a store · its popup is checked from the next session, never this one");
+    if(S.seg==="lapsed"&&S.exitKind!=="none"){flips.push("bought something · lapsed rules stop, now Non-frequent");S.seg="nonfreq";}
     armed.buy=false;
   }
 
   if(armed.withdraw){
-    if(S.balance){S.balance=false;S.lastWithdrawal=day;flips.push("balance withdrawn · withdraw nudge dead");}
+    if(S.balance){S.balance=false;S.lastWithdrawal=day;flips.push("money withdrawn · withdraw nudge gone");}
     armed.withdraw=false;
   }
 
   if(!fired){
-    if(S.seg==="never")why="Every blocking rule is in cooldown or already used up, and no contextual rule exists for this segment.";
-    else if(S.seg==="nonfreq")why="No contextual scheduled, permissions settled, nothing event-driven. No dedicated contextual content exists for this segment yet.";
-    else if(S.seg==="freq")why="Nothing blocking, by design. Frequent users get the ambient layer only.";
-    else why="No rule's conditions are met this session.";
+    if(S.seg==="never")why="Every popup is either waiting out a gap or already used up, and this user type has no contextual nudges at all.";
+    else if(S.seg==="nonfreq")why="Nothing scheduled, permissions already answered, no store visit to react to. This user type has no contextual nudges of its own.";
+    else if(S.seg==="freq")why="Nothing pops up, and that is deliberate. Frequent users only get the quiet nudges.";
+    else why="No rule matches this session.";
   }
 
   if(armed.task){
-    if(!S.taskDone){S.taskDone=true;S.tabOpened=true;flips.push("task attempted · mission pulse stops for life");}
+    if(!S.taskDone){S.taskDone=true;S.tabOpened=true;flips.push("tried a task · logo pulse stops for good");}
     armed.task=false;
   }
 
-  if(S.seg==="new"&&sessionNo===1)fork("d0",`Day 0 collision: the onboarding coach-mark walkthrough and the push primer both want session 1. Ruling #1 is open. This walk gave it to ${fired?fired.toLowerCase():"nothing, because neither was eligible"}.`);
+  if(S.seg==="new"&&sessionNo===1)fork("d0",`Day 0 clash: the walkthrough and the notifications popup both want the first session. Open question #1. This walk gave it to ${fired?fired.toLowerCase():"neither, because neither was due"}.`);
 
   const amb=[];
   if(S.tg&&S.primaryShown&&!S.taskDone)amb.push("Mission logo pulse");
@@ -484,16 +487,16 @@ function showFrame(i){
   const cap=document.getElementById("cap");
   cap.className="cap"+(f.fired?" fired":"");
   cap.innerHTML=`
-    <div class="caphead"><span class="sn">S${f.n}</span><span class="day">calendar day ${f.day}</span>
+    <div class="caphead"><span class="sn">S${f.n}</span><span class="day">day ${f.day}</span>
       ${f.event?`<span class="evt">${f.event}</span>`:""}</div>
-    <h3 class="${f.fired?"":"none"}"><span class="dot"></span>${f.fired||"No blocking nudge"}</h3>
+    <h3 class="${f.fired?"":"none"}"><span class="dot"></span>${f.fired||"Nothing popped up"}</h3>
     <div class="why">${f.why}</div>
     ${f.tie?`<div class="tie">${f.tie}</div>`:""}
-    <div class="amb"><span class="lbl">Alongside</span>${
+    <div class="amb"><span class="lbl">Also running</span>${
       f.amb.length?f.amb.map(a=>`<span class="chip${a.startsWith("No gamification")?" grey":""}">${a}</span>`).join("")
                   :`<span class="chip grey">nothing</span>`}</div>
     ${f.flips.length?`<div class="flips">→ ${f.flips.map(x=>`<b>${x}</b>`).join(" · ")}</div>`:""}
-    ${f.forks&&f.forks.length?`<div class="fork"><span class="lbl">Open ruling in play</span>${f.forks.map(x=>`<p>${x}</p>`).join("")}</div>`:""}`;
+    ${f.forks&&f.forks.length?`<div class="fork"><span class="lbl">Open question in play</span>${f.forks.map(x=>`<p>${x}</p>`).join("")}</div>`:""}`;
   renderRail();
 }
 
@@ -506,28 +509,28 @@ function renderRail(){
 }
 function snapshot(){return {notif:S.notif,smsGranted:S.smsGranted,primaryShown:S.primaryShown,taskDone:S.taskDone,smsBurned:S.smsBurned,txns:S.txns,pendingExit:S.pendingExit};}
 function renderState(before){
-  const p=S.notif?"dead":(S.primerLastNo===null||day-S.primerLastNo>=5?"ready":`${5-(day-S.primerLastNo)}d left`);
+  const p=S.notif?"gone":(S.primerLastNo===null||day-S.primerLastNo>=5?"due":`${5-(day-S.primerLastNo)}d to wait`);
   const rows=[["Notifications",S.notif?"given":"not given",S.notif,"notif"],
-    ["Primer timer",p,(p==="dead"||p==="ready"),null],
+    ["Notification popup",p,(p==="gone"||p==="due"),null],
     ["Group",S.tg?"TG":"CG",S.tg,null],
-    ["Gamification intro",S.primaryShown?"shown":"not shown",!S.primaryShown,"primaryShown"],
-    ["Task attempted",S.taskDone?"yes":"no",S.taskDone,"taskDone"],
+    ["Missions intro",S.primaryShown?"shown":"not shown",!S.primaryShown,"primaryShown"],
+    ["Tried a task",S.taskDone?"yes":"no",S.taskDone,"taskDone"],
     ["SMS permission",S.smsGranted?"given":"not given",S.smsGranted,"smsGranted"],
-    ["SMS interactions",`${S.smsBurned} of 4`,S.smsBurned<4,"smsBurned"],
+    ["SMS dismissals",`${S.smsBurned} of 4`,S.smsBurned<4,"smsBurned"],
     ["Purchases",String(S.txns),S.txns>0,"txns"],
-    ["Exit awaiting a popup",S.pendingExit?({tracked:"tracked",confirmed:"confirmed",none:"nothing tracked"})[S.pendingExit]:"none",!S.pendingExit,"pendingExit"],
-    ["Segment now",{new:"New",never:"Never shopped",lapsed:"Lapsed",nonfreq:"Non-frequent",freq:"Frequent"}[S.seg],true,null]];
+    ["Store visit waiting",S.pendingExit?({tracked:"tracked",confirmed:"confirmed",none:"nothing tracked"})[S.pendingExit]:"none",!S.pendingExit,"pendingExit"],
+    ["User type now",SEGLABEL[S.seg],true,null]];
   document.getElementById("state").innerHTML=rows.map(r=>{
     const ch=before&&r[3]&&String(before[r[3]])!==String(S[r[3]]);
     return `<div class="st${ch?" changed":""}"><span class="k">${r[0]}</span><span class="v ${r[2]?"on":"off"}">${r[1]}</span></div>`;}).join("");
 }
 function renderClocks(){
-  document.getElementById("clocks").innerHTML=`calendar day <b>${day}</b> · app-open days <b>${openDays}</b> · sessions <b>${sessionNo}</b>`;
+  document.getElementById("clocks").innerHTML=`day <b>${day}</b> · days they opened the app <b>${openDays}</b> · sessions <b>${sessionNo}</b>`;
 }
 function eventLabel(){
-  const l=[];if(armed.buy)l.push("exit to a store");if(armed.task)l.push("task attempt");
-  if(armed.grant)l.push("permission granted");if(S.ctxPick.length)l.push(`${S.ctxPick.length} contextual scheduled`);
-  if(armed.xtap)l.push("X-tap dismiss");if(armed.withdraw)l.push("withdrawal");
+  const l=[];if(armed.buy)l.push("went to a store");if(armed.task)l.push("tried a task");
+  if(armed.grant)l.push("gave permission");if(S.ctxPick.length)l.push(`${S.ctxPick.length} contextual on`);
+  if(armed.xtap)l.push("tapped X");if(armed.withdraw)l.push("withdrew money");
   return l.length?l.join(" · "):null;
 }
 function renderArmed(){
@@ -540,28 +543,28 @@ function clearArmed(){armed={};renderArmed();}
 
 function renderCtxPanel(){
   const here=SEGNAME[S.seg];
-  let html=`<div class="ctxhead"><span class="t">Pick a contextual</span><button class="x" id="ctxclose">Done</button></div>
-    <div class="ctxsub">All of these sit at P1 with no order between them. Arm more than one to see the collision. ${here
-      ? `Segment now: ${here}.`
-      : `Segment now: ${SEGLABEL[S.seg]}, which has no contextual content in the master map at all. Every row below is off-segment. That is gaps #4 and #5.`}</div>`;
+  let html=`<div class="ctxhead"><span class="t">Pick a contextual nudge</span><button class="x" id="ctxclose">Done</button></div>
+    <div class="ctxsub">These all compete for the same single place at the top of the order. Turn on two to watch them clash. ${here
+      ? `This user type: ${here}.`
+      : `This user type is ${SEGLABEL[S.seg]}, and it has no contextual nudges of its own at all. Everything below belongs to a different type. That gap is open questions #4 and #5.`}</div>`;
   ["New User","Lapsed","Frequent"].forEach(g=>{
     const rows=CONTEXTUAL.filter(c=>c.seg===g);
     if(!rows.length)return;
-    html+=`<div class="ctxg">${g}${g===here?"":" · off-segment"}</div>`;
+    html+=`<div class="ctxg">${g}${g===here?"":" · not this user type"}</div>`;
     rows.forEach(c=>{
       const on=S.ctxPick.includes(c.id);
       const used=S.ctxSeen[c.id]!==undefined&&c.gap===null;
-      html+=`<div class="ctxr ${on?"on":""} ${c.seg===here?"":"off"}" data-id="${c.id}">
+      html+=`<div class="ctxr ${on?"on":""} ${c.seg===here?"":"off"}" data-id="${c.id}" title="${c.cad} · ${c.trig}">
         <span class="box"></span>
         <span class="tx">
           <span class="nm">${c.key}</span>
-          <span class="tg">${c.id} · ${c.cad}${c.amb?" · ambient, no session slot":""}</span>
-          ${used?'<span class="dead">shown once, done for life</span>':""}
+          <span class="tg">${c.id} · shows ${PLAIN[c.cad]||c.cad}${c.amb?" · quiet, does not use the one place":""}</span>
+          ${used?'<span class="dead">already shown, gone for good</span>':""}
           <span class="tr">${c.trig}</span>
         </span></div>`;
     });
   });
-  html+=`<div class="ctxnote">14 of the master map's 23 nudges. The other 9 fire on their own screens (My Earnings, order detail, store page, search, refer) so they never contend for the homepage session slot. Off-segment rows stay selectable on purpose.</div>`;
+  html+=`<div class="ctxnote">These are 14 of the 23 nudges in the map. The other 9 show up on other screens (My Earnings, order details, store page, search, refer), so they never compete for a place here. Rows from other user types stay clickable on purpose, so you can force a clash.</div>`;
   document.getElementById("ctxpanel").innerHTML=html;
   document.getElementById("ctxclose").addEventListener("click",closeCtx);
   document.querySelectorAll("#ctxpanel .ctxr").forEach(r=>r.addEventListener("click",()=>{
